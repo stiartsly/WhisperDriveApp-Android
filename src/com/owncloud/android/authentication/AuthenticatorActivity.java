@@ -26,9 +26,11 @@ package com.owncloud.android.authentication;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
@@ -67,6 +69,7 @@ import com.owncloud.android.BuildConfig;
 import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.SsoWebViewClient.SsoWebViewClientListener;
+import com.owncloud.android.device.WhisperDevice;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentials;
@@ -94,6 +97,9 @@ import com.owncloud.android.ui.dialog.SamlWebViewDialog;
 import com.owncloud.android.ui.dialog.SslUntrustedCertDialog;
 import com.owncloud.android.ui.dialog.SslUntrustedCertDialog.OnSslUntrustedCertListener;
 import com.owncloud.android.utils.DisplayUtils;
+
+import com.owncloud.android.device.MipcaActivityCapture;
+import com.owncloud.android.device.WhisperDeviceManager;
 
 import java.security.cert.X509Certificate;
 import java.util.Map;
@@ -286,6 +292,14 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             }
         });
 
+        findViewById(R.id.devicePairButton).setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AuthenticatorActivity.this, MipcaActivityCapture.class);
+                startActivity(intent);
+            }
+        });
 
         /// initialize block to be moved to single Fragment to check server and get info about it 
         initServerPreFragment(savedInstanceState);
@@ -409,15 +423,20 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         
         /// step 2 - set properties of UI elements (text, visibility, enabled...)
         mHostUrlInput = (EditText) findViewById(R.id.hostUrlInput);
+        if (WhisperDeviceManager.getInstance().currentDevice != null) {
+            mHostUrlInput.setText(WhisperDeviceManager.getInstance().currentDevice.deviceName);
+        }
         // Convert IDN to Unicode
-        mHostUrlInput.setText(DisplayUtils.convertIdn(mServerInfo.mBaseUrl, false));
-        if (mAction != ACTION_CREATE) {
+        //mHostUrlInput.setText(DisplayUtils.convertIdn(mServerInfo.mBaseUrl, false));
+        //if (mAction != ACTION_CREATE)
+        {
             /// lock things that should not change
             mHostUrlInput.setEnabled(false);
             mHostUrlInput.setFocusable(false);
         }
         if (isUrlInputAllowed) {
-            if (mServerInfo.mBaseUrl.isEmpty()) {
+            //if (mServerInfo.mBaseUrl.isEmpty()) {
+            if (WhisperDeviceManager.getInstance().currentDevice == null) {
                 checkHostUrl = false;
             }
             mRefreshButton = findViewById(R.id.embeddedRefreshButton);
@@ -699,6 +718,17 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (WhisperDeviceManager.getInstance().currentDevice != null) {
+            mHostUrlInput.setText(WhisperDeviceManager.getInstance().currentDevice.deviceName);
+        }
+        else {
+            mHostUrlInput.setText("");
+        }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("WhisperDeviceConnected");
+        this.registerReceiver(broadcastReceiver, filter);
         
         // bound here to avoid spurious changes triggered by Android on device rotations
         mHostUrlInput.setOnFocusChangeListener(this);
@@ -723,6 +753,8 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         
         mHostUrlInput.removeTextChangedListener(mHostUrlInputWatcher);
         mHostUrlInput.setOnFocusChangeListener(null);
+
+        this.unregisterReceiver(broadcastReceiver);
 
         super.onPause();
     }
@@ -778,15 +810,16 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
      * Handles the change of focus on the text inputs for the server URL and the password
      */
     public void onFocusChange(View view, boolean hasFocus) {
-        if (view.getId() == R.id.hostUrlInput) {   
-            if (!hasFocus) {
-                onUrlInputFocusLost();
-            }
-            else {
-                showRefreshButton(false);
-            }
-
-        } else if (view.getId() == R.id.account_password) {
+//        if (view.getId() == R.id.hostUrlInput) {
+//            if (!hasFocus) {
+//                onUrlInputFocusLost();
+//            }
+//            else {
+//                showRefreshButton(false);
+//            }
+//
+//        }
+        if (view.getId() == R.id.account_password) {
             onPasswordFocusChanged(hasFocus);
         }
     }
@@ -812,17 +845,35 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         }
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String deviceId = intent.getExtras().getString("deviceId");
+            if (WhisperDeviceManager.getInstance().currentDevice.deviceId.equals(deviceId)) {
+                checkOcServer();
+            }
+        };
+    };
 
     private void checkOcServer() {
-        String uri = mHostUrlInput.getText().toString().trim();
+//        String uri = mHostUrlInput.getText().toString().trim();
         mServerIsValid = false;
         mServerIsChecked = false;
         mOkButton.setEnabled(false);
         mServerInfo = new GetServerInfoOperation.ServerInfo();
         showRefreshButton(false);
 
-        if (uri.length() != 0) {
-            uri = stripIndexPhpOrAppsFiles(uri, mHostUrlInput);
+//        if (uri.length() != 0) {
+//        uri = stripIndexPhpOrAppsFiles(uri, mHostUrlInput);
+        WhisperDevice device = WhisperDeviceManager.getInstance().currentDevice;
+        if (device == null) {
+            mServerStatusText = 0;
+            mServerStatusIcon = 0;
+            showServerStatus();
+
+        } else if (device.connect(true)) {
+            String uri = "http://127.0.0.1:" + device.localPort + "/owncloud";
+            Log_OC.d(TAG, "checkOcServer url : " + uri );
 
             // Handle internationalized domain names
             try {
@@ -851,6 +902,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
             mServerStatusText = 0;
             mServerStatusIcon = 0;
             showServerStatus();
+            showRefreshButton(true);
         }
     }
 
@@ -1211,13 +1263,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
         case OK_NO_SSL:
         case OK:
-            if (mHostUrlInput.getText().toString().trim().toLowerCase().startsWith("http://") ) {
+//            if (mHostUrlInput.getText().toString().trim().toLowerCase().startsWith("http://") ) {
                 mServerStatusText = R.string.auth_connection_established;
                 mServerStatusIcon = R.drawable.ic_ok;
-            } else {
-                mServerStatusText = R.string.auth_nossl_plain_ok_title;
-                mServerStatusIcon = R.drawable.ic_lock_open;
-            }
+//            } else {
+//                mServerStatusText = R.string.auth_nossl_plain_ok_title;
+//                mServerStatusIcon = R.drawable.ic_lock_open;
+//            }
             break;
 
         case NO_NETWORK_CONNECTION:
@@ -1292,13 +1344,13 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
         case OK_NO_SSL:
         case OK:
-            if (mHostUrlInput.getText().toString().trim().toLowerCase().startsWith("http://") ) {
+//            if (mHostUrlInput.getText().toString().trim().toLowerCase().startsWith("http://") ) {
                 mAuthStatusText = R.string.auth_connection_established;
                 mAuthStatusIcon = R.drawable.ic_ok;
-            } else {
-                mAuthStatusText = R.string.auth_nossl_plain_ok_title;
-                mAuthStatusIcon = R.drawable.ic_lock_open;
-            }
+//            } else {
+//                mAuthStatusText = R.string.auth_nossl_plain_ok_title;
+//                mAuthStatusIcon = R.drawable.ic_lock_open;
+//            }
             break;
 
         case NO_NETWORK_CONNECTION:

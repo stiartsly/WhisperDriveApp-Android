@@ -112,13 +112,26 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical|right"
-                        android:layout_marginRight="5dp"
+                        android:layout_marginRight="50dp"
                         android:background="@android:color/transparent"
                         android:contentDescription="@string/auth_refresh_button"
                         android:padding="0dp"
                         android:scaleType="fitCenter"
                         android:src="@drawable/ic_action_refresh_grey"
                         android:visibility="gone"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/devicePairButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|right"
+                        android:layout_marginRight="5dp"
+                        android:background="@android:color/transparent"
+                        android:padding="8dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_navigate_next"
+                        android:visibility="visible"
                         />
                 </FrameLayout>
 

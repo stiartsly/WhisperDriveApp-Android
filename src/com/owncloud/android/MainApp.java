@@ -27,9 +27,11 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.widget.Toast;
 
 import com.owncloud.android.authentication.PassCodeManager;
 import com.owncloud.android.datamodel.ThumbnailsCacheManager;
+import com.owncloud.android.device.WhisperDeviceManager;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory.Policy;
 import com.owncloud.android.lib.common.utils.Log_OC;
@@ -127,6 +129,13 @@ public class MainApp extends Application {
                 Log_OC.d(activity.getClass().getSimpleName(), "onDestroy() ending" );
             }
         });
+
+        if (WhisperDeviceManager.getInstance().initialize()) {
+            Toast.makeText(MainApp.mContext, "开启客户端成功", Toast.LENGTH_SHORT).show();
+        }
+        else {
+            Toast.makeText(MainApp.mContext, "开启客户端失败", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static Context getAppContext() {

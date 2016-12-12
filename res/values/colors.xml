@@ -56,4 +56,11 @@
     <!-- Multiselect backgrounds -->
     <color name="selected_item_background">#ECECEC</color>
 
+    <color name="header_color">#0077d9</color>
+    <color name="white_color">#ffffff</color>
+
+    <!-- zxing -->
+    <color name="result_view">#b0000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
 </resources>

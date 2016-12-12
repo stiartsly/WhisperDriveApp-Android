@@ -54,6 +54,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".MainApp"
@@ -196,6 +198,10 @@
         <activity android:name=".ui.errorhandling.ErrorShowActivity" />
         <activity android:name=".ui.activity.UploadListActivity" />
         
+        <activity android:name=".device.MipcaActivityCapture"/>
+        <activity android:name=".device.AddDeviceIdActivity" />
+        <activity android:name=".device.ClientPairActivity" />
+
         <receiver android:name=".broadcastreceivers.ConnectivityActionReceiver"
             android:enabled="true" android:label="ConnectivityActionReceiver">
             <intent-filter>

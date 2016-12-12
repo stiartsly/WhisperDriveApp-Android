@@ -46,7 +46,7 @@
   <string name="recommend_subject">在您的智能手机上试用 %1$s！</string>
   <string name="recommend_text">我邀请你在智能手机上使用 %1$s\n下载路径：%2$s</string>
   <string name="auth_check_server">检查服务器</string>
-  <string name="auth_host_url">服务器地址 https://...</string>
+  <string name="auth_host_url">服务器</string>
   <string name="auth_username">用户名</string>
   <string name="auth_password">密码</string>
   <string name="auth_register">初次使用 %1$s?</string>
