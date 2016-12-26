@@ -14,7 +14,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("create table current_device(_id integer primary key autoincrement, device_id char(50))");
+		db.execSQL("create table current_device(_id integer primary key autoincrement, username char(50), device_id char(50))");
 		db.execSQL("create table device_message(_id integer primary key autoincrement, device_id char(50), device_name char(50), local_port integer)");
 	}
 

@@ -311,7 +311,7 @@
   <string name="forbidden_permissions_create">创建文件</string>
   <string name="uploader_upload_forbidden_permissions">在此文件夹上传</string>
   <string name="downloader_download_file_not_found">该文件在服务器上不可用</string>
-  <string name="prefs_category_accounts">账号</string>
+  <string name="prefs_category_accounts">Owncloud账号</string>
   <string name="prefs_add_account">添加账号</string>
   <string name="auth_redirect_non_secure_connection_title">安全连接是通过一个非安全路由定向的。</string>
   <string name="actionbar_logger">日志</string>

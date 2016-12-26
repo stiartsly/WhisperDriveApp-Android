@@ -39,7 +39,6 @@ public class ClientPairActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_pair_richscan_result);
 		initView();
 		listen();
-		ivDevicePre.setImageResource(R.drawable.device_pre);
 		tvDeviceId.setText(deviceId);
 //		cameraManager.getDeviceName(deviceId, new WhisperAsyncProxy<String>() {
 //			@Override

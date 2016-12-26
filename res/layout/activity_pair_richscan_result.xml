@@ -52,15 +52,15 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="270dp" >
+            android:layout_height="210dp" >
 
             <ImageView
                 android:id="@+id/iv_device_pre"
-                android:layout_width="260dp"
-                android:layout_height="173dp"
+                android:layout_width="200dp"
+                android:layout_height="100dp"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="40dp"
-                android:src="@drawable/device_pre" />
+                android:layout_marginTop="30dp"
+                android:src="@drawable/logo" />
 
             <TextView
                 android:id="@+id/tv_device_id"
@@ -68,8 +68,10 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@id/iv_device_pre"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="5dp"
-                android:text="ABCD-12345678"
+                android:layout_marginTop="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:text=""
                 android:textColor="#ababab"
                 android:textSize="16sp" />
         </RelativeLayout>
@@ -87,7 +89,7 @@
                 android:layout_height="40dp"
                 android:background="@drawable/shape_red_corners_edittext"
                 android:digits="0123456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ"
-                android:hint="请输入密码  (不填密码由主人授权使用)"
+                android:hint="请输入密码  (演示版本密码为password)"
                 android:padding="10dp"
                 android:singleLine="true"
                 android:textColorHint="#cccccc"

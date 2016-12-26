@@ -130,10 +130,7 @@ public class MainApp extends Application {
             }
         });
 
-        if (WhisperDeviceManager.getInstance().initialize()) {
-            Toast.makeText(MainApp.mContext, "开启客户端成功", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        if (!WhisperDeviceManager.getInstance().initialize()) {
             Toast.makeText(MainApp.mContext, "开启客户端失败", Toast.LENGTH_SHORT).show();
         }
     }

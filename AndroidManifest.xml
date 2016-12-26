@@ -198,6 +198,8 @@
         <activity android:name=".ui.errorhandling.ErrorShowActivity" />
         <activity android:name=".ui.activity.UploadListActivity" />
         
+        <activity android:name=".device.WhisperLoginActivity" />
+        <activity android:name=".device.DeviceListActivity" />
         <activity android:name=".device.MipcaActivityCapture"/>
         <activity android:name=".device.AddDeviceIdActivity" />
         <activity android:name=".device.ClientPairActivity" />

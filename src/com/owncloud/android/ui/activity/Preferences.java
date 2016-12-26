@@ -27,6 +27,7 @@ import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -73,6 +74,8 @@ import com.owncloud.android.authentication.AuthenticatorActivity;
 import com.owncloud.android.datamodel.FileDataStorageManager;
 import com.owncloud.android.datamodel.OCFile;
 import com.owncloud.android.db.PreferenceManager.InstantUploadsConfiguration;
+import com.owncloud.android.device.WhisperDevice;
+import com.owncloud.android.device.WhisperDeviceManager;
 import com.owncloud.android.ui.helpers.FileOperationsHelper;
 import com.owncloud.android.files.services.FileDownloader;
 import com.owncloud.android.files.services.FileUploader;
@@ -152,6 +155,11 @@ public class Preferences extends PreferenceActivity
                     setContentDescription(getString(R.string.actionbar_settings));
         }
 
+        Preference whisperAccountPreference = findPreference("whisper_accounts");
+        if (whisperAccountPreference != null) {
+            whisperAccountPreference.setTitle(WhisperDeviceManager.getInstance().username);
+        }
+
         // Load the accounts category for adding the list of accounts
         mAccountsPrefCategory = (PreferenceCategory) findPreference("accounts_category");
 
@@ -160,6 +168,27 @@ public class Preferences extends PreferenceActivity
         listView.setOnItemLongClickListener(new OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 1) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(Preferences.this);
+                    builder.setTitle("登出Whisper账号？");
+                    builder.setPositiveButton(R.string.common_ok, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            AccountManager am = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+                            Account accounts[] = am.getAccountsByType(MainApp.getAccountType());
+                            for (Account a : accounts) {
+                                am.removeAccount(a, null, null);
+                            }
+
+                            WhisperDeviceManager.getInstance().stop();
+                            finish();
+                        }
+                    });
+                    builder.setNegativeButton(R.string.common_cancel, null);
+                    builder.show();
+                    return true;
+                }
+
                 ListView listView = (ListView) parent;
                 ListAdapter listAdapter = listView.getAdapter();
                 Object obj = listAdapter.getItem(position);
@@ -790,10 +819,20 @@ public class Preferences extends PreferenceActivity
                 accountPreference.setKey(a.name);
                 try {
                     oca = new OwnCloudAccount(a, this);
-                    accountPreference.setTitle(
-                        oca.getDisplayName() + " @ " +
-                        DisplayUtils.convertIdn(a.name.substring(a.name.lastIndexOf("@") + 1), false)
-                    );
+                    String server = null;
+                    int port = oca.getBaseUri().getPort();
+                    for (WhisperDevice device : WhisperDeviceManager.getInstance().getDevices()) {
+                        if (device.localPort == port) {
+                            server = device.deviceName;
+                            break;
+                        }
+                    }
+                    if (server == null) {
+                        String serverUrl = a.name.substring(a.name.lastIndexOf("@") + 1);
+                        server = DisplayUtils.convertIdn(serverUrl, false);
+                    }
+
+                    accountPreference.setTitle(oca.getDisplayName() + " @ " + server);
                 } catch (Exception e) {
                     Log_OC.w(
                         TAG,

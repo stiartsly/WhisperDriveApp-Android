@@ -192,7 +192,7 @@ public class WhisperDevice {
 							condition.signal();
 							lock.unlock();
 						}
-					}, this);
+					}, null);
 
 					condition.await(10, TimeUnit.SECONDS);
 				} catch (WhisperException e) {
@@ -228,7 +228,10 @@ public class WhisperDevice {
 		protected Void doInBackground(Integer... params) {
 			if (params[0] > 0) {
 				try {
-					WhisperPortForwarding.getInstance().close(params[0]);
+					WhisperPortForwarding pfInstance = WhisperPortForwarding.getInstance();
+					if (pfInstance != null) {
+						pfInstance.close(params[0]);
+					}
 				} catch (WhisperException e) {
 					e.printStackTrace();
 				}

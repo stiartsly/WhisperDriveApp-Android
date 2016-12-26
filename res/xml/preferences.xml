@@ -19,6 +19,16 @@
 -->
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <PreferenceCategory
+        android:title="Whisper账号"
+        android:key="whisper_accounts_category"
+        >
+        <Preference
+            android:title="email"
+            android:key="whisper_accounts"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:title="@string/prefs_category_accounts"
         android:key="accounts_category"
         >

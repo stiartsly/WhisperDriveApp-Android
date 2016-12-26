@@ -70,6 +70,7 @@ import com.owncloud.android.MainApp;
 import com.owncloud.android.R;
 import com.owncloud.android.authentication.SsoWebViewClient.SsoWebViewClientListener;
 import com.owncloud.android.device.WhisperDevice;
+import com.owncloud.android.device.WhisperLoginActivity;
 import com.owncloud.android.lib.common.OwnCloudAccount;
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.OwnCloudCredentials;
@@ -98,7 +99,7 @@ import com.owncloud.android.ui.dialog.SslUntrustedCertDialog;
 import com.owncloud.android.ui.dialog.SslUntrustedCertDialog.OnSslUntrustedCertListener;
 import com.owncloud.android.utils.DisplayUtils;
 
-import com.owncloud.android.device.MipcaActivityCapture;
+import com.owncloud.android.device.DeviceListActivity;
 import com.owncloud.android.device.WhisperDeviceManager;
 
 import java.security.cert.X509Certificate;
@@ -296,7 +297,7 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
 
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AuthenticatorActivity.this, MipcaActivityCapture.class);
+                Intent intent = new Intent(AuthenticatorActivity.this, DeviceListActivity.class);
                 startActivity(intent);
             }
         });
@@ -425,6 +426,10 @@ public class AuthenticatorActivity extends AccountAuthenticatorActivity
         mHostUrlInput = (EditText) findViewById(R.id.hostUrlInput);
         if (WhisperDeviceManager.getInstance().currentDevice != null) {
             mHostUrlInput.setText(WhisperDeviceManager.getInstance().currentDevice.deviceName);
+        }
+        else {
+            Intent intent = new Intent(this, WhisperLoginActivity.class);
+            startActivity(intent);
         }
         // Convert IDN to Unicode
         //mHostUrlInput.setText(DisplayUtils.convertIdn(mServerInfo.mBaseUrl, false));
